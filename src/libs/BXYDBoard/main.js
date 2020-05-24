@@ -9,7 +9,7 @@ class BXYDboard {
      * @author: yangwenbo
      * @date: 2020/5/17  11:14
      */
-    constructor(element,callback) {
+    constructor(element) {
         // 缓存this
         let me = this
         // 获取画布dom元素
@@ -28,11 +28,12 @@ class BXYDboard {
                 // 开启新的路径
                 me.context.beginPath()
                 //
-                callback && callback({
-                    x: mouseX,
-                    y: mouseY,
-                    event: ev
-                })
+                // callback && callback({
+                //     x: mouseX,
+                //     y: mouseY,
+                //     event: ev
+                // })
+                me.emit("path",{mouseX,mouseY})
                 // 设置鼠标按下坐标
                 me.context.moveTo(mouseX,mouseY)
                 // 给画布添加移动事件
@@ -45,11 +46,12 @@ class BXYDboard {
                     me.context.lineTo(moveX,moveY)
                     //
                     me.context.stroke()
-                    callback && callback({
-                        x: moveX,
-                        y: moveY,
-                        event: ev
-                    })
+                    // callback && callback({
+                    //     x: moveX,
+                    //     y: moveY,
+                    //     event: ev
+                    // })
+                    me.emit("path",{moveX,moveY})
                 }
                 this.onmouseup = function () {
                     me.element.onmousemove = null;
@@ -67,11 +69,12 @@ class BXYDboard {
                 me.context.beginPath()
                 // 设置鼠标按下坐标
                 me.context.moveTo(mouseX,mouseY)
-                callback && callback(
-                    {
-                        x: mouseX,
-                        y: mouseY
-                    })
+                // callback && callback(
+                //     {
+                //         x: mouseX,
+                //         y: mouseY
+                //     })
+                me.emit("path",{mouseX,mouseY})
                 // 给画布添加移动事件
                 this.addEventListener("touchmove",function (eve) {
                     let ev = eve ;
@@ -81,11 +84,12 @@ class BXYDboard {
                     // 画线
                     me.context.lineTo(moveX,moveY)
                     //
-                    callback && callback(
-                        {
-                            x: moveX,
-                            y: moveY
-                        })
+                    // callback && callback(
+                    //     {
+                    //         x: moveX,
+                    //         y: moveY
+                    //     })
+                    me.emit("path",{moveX,moveY})
                     me.context.stroke()
 
                 })
@@ -96,8 +100,12 @@ class BXYDboard {
     }
 
 
-    getPath(){
-
+    getPath(x = 0, y = 0 ){
+        console.log('x,x',x,'y',y)
+        return {
+            x: x,
+            y: y
+        }
     }
     /**
      * @file: BXYDboard.html
@@ -168,6 +176,27 @@ class BXYDboard {
         this.context.lineTo(x, y)
         this.context.strokeStyle = "red"
         this.context.stroke()
+    }
+
+    addEventListener (eventName, handler) {
+        // let self = this;
+        if (!this.handler){
+            this.handler = {}
+        }
+        if (!this.handler[eventName]){
+            this.handler[eventName] = []
+        }
+        this.handler[eventName].push(handler)
+    }
+
+    emit (eventName){
+        if (!this.handler[eventName]){
+            return false
+        } else {
+            for(var i = 0; i<this.handler[eventName].length;i++){
+                this.handler[eventName][i](arguments[1])
+            }
+        }
     }
 }
 
