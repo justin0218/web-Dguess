@@ -13,8 +13,8 @@ class BXYDboard {
         // 缓存this
         let me = this
         // 获取画布dom元素
-        this.element = document.getElementById(element)
-            console.log('',this.element)
+        this.element = document.querySelector(element)
+            console.log(this.element)
         // 获取画图上下文环境
         this.context = this.element.getContext("2d")
         //给画布添加鼠标按下的事件
@@ -74,7 +74,7 @@ class BXYDboard {
                 //         x: mouseX,
                 //         y: mouseY
                 //     })
-                me.emit("path",{mouseX,mouseY})
+                me.emit("startpath",{mouseX,mouseY})
                 // 给画布添加移动事件
                 this.addEventListener("touchmove",function (eve) {
                     let ev = eve ;
@@ -99,7 +99,6 @@ class BXYDboard {
 
     }
 
-
     getPath(x = 0, y = 0 ){
         console.log('x,x',x,'y',y)
         return {
@@ -121,8 +120,6 @@ class BXYDboard {
         this.element.height = h;
     }
     /**
-     * @file: BXYDboard.html
-     * @method setColor
      * @param {string} color - 线条的颜色
      * @description:
      * @author: yangwenbo
@@ -131,6 +128,7 @@ class BXYDboard {
     setColor(color) {
         this.context.beginPath()
         this.context.strokeStyle = color
+        this.context.closePath()
         this.context.stroke()
 
     }
@@ -146,6 +144,7 @@ class BXYDboard {
     setCrude(num){
         this.context.beginPath();
         this.context.lineWidth = num
+        this.context.scale(window.devicePixelRatio, window.devicePixelRatio);
         this.context.closePath()
     }
 
@@ -172,10 +171,15 @@ class BXYDboard {
         }
         return flag
     }
+    // 绘制
     setPath(x,y) {
         this.context.lineTo(x, y)
-        this.context.strokeStyle = "red"
+        this.context.strokeStyle = "blue"
         this.context.stroke()
+    }
+    // 禁止绘画
+    forbidDraw(is){
+       is ? (this.element.style.pointerEvents = 'none') : (this.element.style.pointerEvents = 'auto')
     }
 
     addEventListener (eventName, handler) {
@@ -198,6 +202,9 @@ class BXYDboard {
             }
         }
     }
+
+
 }
+
 
 export default BXYDboard
