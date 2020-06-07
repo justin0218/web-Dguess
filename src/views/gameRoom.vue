@@ -1,13 +1,15 @@
 <template>
   <div class="contaienr">
     <canvas class="canvas"></canvas>
-
+    <ul class="chat-wrap">
+      <li class="chat-item" v-for="item in items" :style="{ width: item.width+'px', height:item.height+'px',left:(item.left)+'px',top: item.top+'px'}">{{item.txt}}</li>
+    </ul>
     <div class="mask" v-show="isShow">
       <button class="start-game" @click="startGame">开始游戏</button>
     </div>
     <div>{{countdown}}</div>
     <button @click="changeColor">色板</button>
-<!--   色板-->
+    <!--   色板-->
     <color-board :showColorBoard="hasColorBoard" @getColor="getColor"></color-board>
 
     <input type="text" v-model="content">
@@ -20,7 +22,9 @@
   import BXYDboard from "../libs/BXYDBoard/main";
   import colorBoard from '@/components/ColorBoard'
   import Toast from "../libs/toast";
+  import CreateChat from "../libs/createChat";
   import ReconnectingWebSocket from '../libs/reconnecting-websocket'
+
   export default {
     name: "gameRoom",
     data() {
@@ -39,13 +43,16 @@
         role: 0,
         roomstatus: 0,
         countdown: 0,
-      //  色板
-        hasColorBoard:false,
+        //  色板
+        hasColorBoard: false,
         setColor: '',
-        content: ''
+        content: '',
+        WIDTH: document.documentElement.clientWidth,
+        HEIGHT: document.documentElement.clientHeight,
+        items:[]
       }
     },
-    components: { colorBoard },
+    components: {colorBoard},
     created() {
       // 房间id
       this.roomId = this.$route.query.roomId
@@ -53,7 +60,13 @@
     mounted() {
       const me = this;
       // 用户信息
-      const userInfo = JSON.parse(sessionStorage.getItem('userinfo'))
+      const userInfo = JSON.parse(localStorage.getItem('userinfo'))
+      if ( !userInfo ) {
+        this.$router.push({
+          path: '/regist'
+        });
+        return
+      }
       this.BXY = new BXYDboard('.canvas')
       this.uid = userInfo.data.id
       this.token = userInfo.data.token
@@ -79,11 +92,13 @@
               y: event.mouseX,
               "color": me.setColor,
               "crude": "",
-              "is_first":true
+              "is_first": true
             }
         }))
       })
       this.BXY.setWIdth(document.documentElement.clientWidth, document.documentElement.clientHeight - 100)
+      this.interval()
+
     },
     methods: {
       // 开始游戏按钮
@@ -119,12 +134,12 @@
           // event = 7  //历史路径
           switch (event.event) {
             case -2:
-            // 禁用画板
-            // this.BXY.forbidDraw(true)
+              // 禁用画板
+              // this.BXY.forbidDraw(true)
               break
             case -1:
-            // 禁用画板
-            //this.BXY.forbidDraw(true)
+              // 禁用画板
+              //this.BXY.forbidDraw(true)
               break
             case 0:
               // 禁用画板
@@ -139,10 +154,10 @@
               // }
               break
             case 1:
-            // 绘制路径
-            // this.BXY.setPath(event.data.x,event.data.y)
-            // 禁用画板
-            //this.BXY.forbidDraw(true)
+              // 绘制路径
+              // this.BXY.setPath(event.data.x,event.data.y)
+              // 禁用画板
+              //this.BXY.forbidDraw(true)
               break
             case 2:
               // 禁用画板
@@ -150,12 +165,12 @@
               this.countdown = event.data.countdown_second
               break
             case 3:
-            // 禁用画板
-            // this.BXY.forbidDraw(true)
+              // 禁用画板
+              // this.BXY.forbidDraw(true)
               break
             case 4:
-            // 禁用画板
-            // this.BXY.forbidDraw(true)
+              // 禁用画板
+              // this.BXY.forbidDraw(true)
               break
             case 5:
               // 成员进来 >= 1 的时候可以点开始按钮
@@ -167,7 +182,7 @@
                 //显示开始按钮
                 this.isShow = true
                 return
-              } else  {
+              } else {
                 //隐藏开始按钮
                 this.isShow = false
               }
@@ -188,30 +203,103 @@
         }
       },
       // 绘制历史坐标
-      drawHistory( data ){
-        for (let i = 0; i < data.length ; i++) {
+      drawHistory(data) {
+        for (let i = 0; i < data.length; i++) {
           this.BXY.setPath(data[i].x, data[i].y)
         }
       },
       // 获取子组件传过来的颜色
-      getColor(color){
+      getColor(color) {
         this.hasColorBoard = false
         this.setColor = color
         this.BXY.setColor(color)
       },
       // 显示色板
-      changeColor(){
+      changeColor() {
         this.hasColorBoard = true
       },
-      sendContent(){
-        this.sendContent = ''
+      // 发送按钮
+      sendContent() {
+       const index = Math.floor(Math.random() * 10 + 1)
+       const top = index * ((this.HEIGHT - 400) / 10)
+        this.items.push({
+          "width":300,
+          "height":30,
+          "txt":"hello",
+          "duration":3000,
+          "left": this.WIDTH,
+          top: top< 100 ? 100 : top
+        })
+
+
+       setTimeout(()=>{
+         for (let i=0;i<this.items.length;i++){
+           this.items[i].left = -this.WIDTH
+         }
+       },100)
+
+        setTimeout(()=>{
+          this.items.shift()
+        },3000)
+        // if (!this.content) {
+        //   Toast.message('不能发送为空')
+        //   return
+        // }
+        // CreateChat.sendMessage(this.content)
+        this.content = ''
+
       },
-      createChat() {
-        const chat = document.createElement('div')
-        chat.style.height = '30px';
-        chat.style.minWidth = '100px';
+
+
+      interval(){
+        // 屏幕宽度  按下发送按钮 从右边到左边 滑动过去
+
+
+
+        clearInterval(timer)
+
+        // 距左距离
+        var timer = setInterval(()=>{
+          const chat = document.querySelectorAll('.chat')
+          if (chat.length ==0) {
+            return
+          }
+          //console.log('aaa',left)
+          for (let i = 0;i < chat.length;i++) {
+            let l = chat[i].style.width-= 0.5
+            chat[i].style.left = l + 'px'
+            //小于屏幕宽度 移除元素，
+            if (l <= (-this.WIDTH) && document.querySelectorAll('.chat')) {
+              // 清除定时器
+              clearInterval(timer)
+              document.body.removeChild(chat[i])
+
+            } else {
+              // left -= 0.5
+              this.interval()
+            }
+
+          }
+        })
+
+       //  for (let i = 0;i < chat.length;i++) {
+       //    left -= 0.5
+       //    chat[i].style.left = left + 'px'
+       //    //小于屏幕宽度 移除元素，
+       //    if (left <= (-this.WIDTH) && document.querySelectorAll('.chat')) {
+       //      // 清除定时器
+       //      cancelAnimationFrame(globalID);
+       //
+       //      document.body.removeChild(chat[i])
+       //    } else {
+       //
+       //    }
+       //    console.log('i',left)
+       //  }
+       // let globalID = window.requestAnimationFrame(this.interval)
 
       }
+
     }
   }
 </script>
@@ -229,7 +317,21 @@
     background-color: rgba(0, 0, 0, .3);
     z-index: 3;
   }
-
+  .chat-wrap {
+    width: 100%;
+    height: 500px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 4;
+  }
+  .chat-item {
+    position: absolute;
+    left: 375px;
+    top: 90px;
+    transition: 5s all;
+    list-style: none;
+  }
   .start-game {
     width: 100px;
     height: 40px;

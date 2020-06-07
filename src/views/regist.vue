@@ -14,7 +14,6 @@
 
 <script>
     import axios from 'axios'
-
     export default {
         name: "regist",
         data() {
@@ -27,7 +26,19 @@
                 code: '',
                 // 验证码id
                 codeId: 0,
+                path:''
             }
+        },
+
+        beforeRouteEnter(to,from,next){
+
+            next(vm => {
+                // 通过“vm”访问组件实例`
+                //可以通过vm.name去访问data里面的name属性，跟this.name一样效果
+                console.log('to',to)
+                console.log('from',from.path)
+                vm.path = from.path
+            })
         },
         mounted() {
             this.initGetVerificationCode()
@@ -48,7 +59,7 @@
             // 验证码
             getCode() {
                 const regular = /\d/
-                if (!this.code.test(regular)) {
+                if (!regular.test(this.code)) {
                     alert('请输入正确的验证码')
                 }
                 console.log(this.code)
@@ -69,10 +80,17 @@
                 }).then(response =>{
                     const data = response.data
                     console.log('response',data)
-                    sessionStorage.setItem('userinfo', JSON.stringify(data))
-                    this.$router.push({
-                        path: '/home'
-                    });
+                    localStorage.setItem('userinfo', JSON.stringify(data))
+                    if (this.path) {
+                        this.$router.push({
+                            path: this.path
+                        });
+                    }else{
+                        this.$router.push({
+                            path: '/home'
+                        });
+                    }
+
                 })
             }
         }
