@@ -56,7 +56,7 @@
       // 创建房间
       createRoom() {
         axios({
-          url:`http://192.168.1.3:14001/v1/gdraw/api/room/create`,
+          url:`http://140.143.188.219:14001/v1/gdraw/api/room/create`,
           method: "post",
           headers:{"Authorization":this.token,'Uid': this.uid}
         }).then( response =>{
@@ -87,7 +87,7 @@
       },
       establish(uid, roomid) {
         let m = this
-        const url = `ws://192.168.1.3:14001/v1/ws/gdraw?uid=${uid}&room=${roomid}`
+        const url = `ws://140.143.188.219:14001/v1/ws/gdraw?uid=${uid}&room=${roomid}`
         this.ws = new WebSocket(url);
         this.ws.onopen = function () {
           // ws.send("发送数据");

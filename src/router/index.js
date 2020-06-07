@@ -17,7 +17,7 @@ const router = new VueRouter({
         { path: '/gameRoom', component: GameRoom},
 
     ],
-    mode:'history'
+    // mode:'history'
     
 })
 

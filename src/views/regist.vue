@@ -46,7 +46,7 @@
         methods: {
             // 获取验证码
             initGetVerificationCode() {
-                axios.get('http://192.168.1.3:14001/v1/gdraw/openapi/vcode/get')
+                axios.get('http://140.143.188.219:14001/v1/gdraw/openapi/vcode/get')
                     .then( response =>{
                         const {code:stateCode, data} = response.data;
                         console.log(response.data);
@@ -73,7 +73,7 @@
                     alert('请输入验证码')
                     return
                 }
-                axios.post('http://192.168.1.3:14001/v1/gdraw/openapi/user/regist',{
+                axios.post('http://140.143.188.219:14001/v1/gdraw/openapi/user/regist',{
                     "nickname": this.userName,
                     "vcode_id": this.codeId,
                     "vcode_answer": this.code

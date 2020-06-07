@@ -1,9 +1,7 @@
 <template>
   <div class="contaienr">
     <canvas class="canvas"></canvas>
-    <ul class="chat-wrap">
-      <li class="chat-item" v-for="item in items" :style="{ width: item.width+'px', height:item.height+'px',left:(item.left)+'px',top: item.top+'px'}">{{item.txt}}</li>
-    </ul>
+
     <div class="mask" v-show="isShow">
       <button class="start-game" @click="startGame">开始游戏</button>
     </div>
@@ -11,7 +9,7 @@
     <button @click="changeColor">色板</button>
     <!--   色板-->
     <color-board :showColorBoard="hasColorBoard" @getColor="getColor"></color-board>
-
+    <create-chat :items="items"></create-chat>
     <input type="text" v-model="content">
     <button @click="sendContent">发送</button>
   </div>
@@ -21,6 +19,7 @@
   import axios from 'axios'
   import BXYDboard from "../libs/BXYDBoard/main";
   import colorBoard from '@/components/ColorBoard'
+  import createChat from '@/components/CreateChat'
   import Toast from "../libs/toast";
   import CreateChat from "../libs/createChat";
   import ReconnectingWebSocket from '../libs/reconnecting-websocket'
@@ -52,7 +51,7 @@
         items:[]
       }
     },
-    components: {colorBoard},
+    components: {colorBoard,createChat},
     created() {
       // 房间id
       this.roomId = this.$route.query.roomId
@@ -113,7 +112,7 @@
       getRoomId() {
         let m = this
         const roomId = ''
-        const url = `ws://192.168.1.3:14001/v1/ws/gdraw?room_id=${roomId || this.roomId}&token=${this.token}&uid=${this.uid}`
+        const url = `ws://140.143.188.219:14001/v1/ws/gdraw?room_id=${roomId || this.roomId}&token=${this.token}&uid=${this.uid}`
         this.ws = new ReconnectingWebSocket(url);
         this.ws.onopen = function () {
           // ws.send("发送数据");
@@ -317,21 +316,7 @@
     background-color: rgba(0, 0, 0, .3);
     z-index: 3;
   }
-  .chat-wrap {
-    width: 100%;
-    height: 500px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 4;
-  }
-  .chat-item {
-    position: absolute;
-    left: 375px;
-    top: 90px;
-    transition: 5s all;
-    list-style: none;
-  }
+
   .start-game {
     width: 100px;
     height: 40px;
