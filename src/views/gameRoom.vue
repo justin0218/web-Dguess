@@ -1,17 +1,57 @@
 <template>
-  <div class="contaienr">
-    <canvas class="canvas"></canvas>
+  <div class="container">
+   <div class="background">
+     <h1>你画我猜</h1>
+     <section class="user-info">
+       <header>
+         <figure>
+           <img src="../assets/images/head.png" alt="">
+         </figure>
+         <div>
+           <p>房主: 小公主</p>
+           <p>ID:123456</p>
+         </div>
+       </header>
+       <div class="room-count">
+         <span>房间人数: </span>
+         <span>{{ countdown }}</span>
+       </div>
+     </section>
+     <canvas class="canvas"></canvas>
 
-    <div class="mask" v-show="isShow">
-      <button class="start-game" @click="startGame">开始游戏</button>
-    </div>
-    <div>{{countdown}}</div>
-    <button @click="changeColor">色板</button>
-    <!--   色板-->
-    <color-board :showColorBoard="hasColorBoard" @getColor="getColor"></color-board>
-    <create-chat :items="items"></create-chat>
-    <input type="text" v-model="content">
-    <button @click="sendContent">发送</button>
+
+     <!-- 画笔重置-->
+     <section class="btn-group">
+       <div>
+         <span class="reset">画笔重置</span>
+       </div>
+       <div>
+         <span class="eraser">橡皮擦</span>
+       </div>
+     </section>
+     <!--画笔选择-->
+     <section class="pencil-select">
+        <p class="pencil-title">画笔选择</p>
+       <div>
+          <figure class="pencil" v-for="(item, index) in pencil" :key="index" @click="pencilCrude(item)">
+            <img :src="item.src" alt="">
+          </figure>
+       </div>
+     </section>
+     <button @click="changeColor">色板</button>
+     <!--   色板-->
+     <color-board :showColorBoard="hasColorBoard" @getColor="getColor"></color-board>
+     <create-chat :items="items"></create-chat>
+     <input type="text" v-model="content">
+     <button @click="sendContent">发送</button>
+     <section class="mask" v-show="isShow">
+       <!--<button class="start-game" >开始游戏</button>-->
+       <div class="start-game" @click="startGame">
+         <img src="../assets/images/begin.png" alt="">
+
+       </div>
+     </section>
+   </div>
   </div>
 </template>
 
@@ -48,7 +88,37 @@
         content: '',
         WIDTH: document.documentElement.clientWidth,
         HEIGHT: document.documentElement.clientHeight,
-        items:[]
+        items:[],
+        starBtn:{
+          row: 5,
+          col: 5,
+        },
+        pencil: [
+            {
+                crude: 1,
+                src: require("../assets/images/pencil1.png")
+            },
+            {
+                crude: 2,
+                src: require("../assets/images/pencil2.png")
+            },
+            {
+                crude: 3,
+                src: require("../assets/images/pencil3.png")
+            },
+            {
+                crude: 4,
+                src: require("../assets/images/pencil4.png")
+            },
+            {
+                crude: 5,
+                src: require("../assets/images/pencil5.png")
+            },
+            {
+                crude: 6,
+                src: require("../assets/images/pencil6.png")
+            }
+        ]
       }
     },
     components: {colorBoard,createChat},
@@ -229,14 +299,11 @@
           "left": this.WIDTH,
           top: top< 100 ? 100 : top
         })
-
-
        setTimeout(()=>{
          for (let i=0;i<this.items.length;i++){
            this.items[i].left = -this.WIDTH
          }
        },100)
-
         setTimeout(()=>{
           this.items.shift()
         },3000)
@@ -248,15 +315,9 @@
         this.content = ''
 
       },
-
-
       interval(){
         // 屏幕宽度  按下发送按钮 从右边到左边 滑动过去
-
-
-
         clearInterval(timer)
-
         // 距左距离
         var timer = setInterval(()=>{
           const chat = document.querySelectorAll('.chat')
@@ -297,13 +358,173 @@
        //  }
        // let globalID = window.requestAnimationFrame(this.interval)
 
-      }
-
+      },
+    // 设置画笔粗细
+        pencilCrude (item) {
+          console.log('item',item.crude)
+        }
     }
   }
 </script>
 
-<style scoped>
+<style scoped lang="less">
+  *{
+    margin: 0;
+    padding: 0;
+  }
+  .container{
+    width: 100%;
+    height: 100%;
+    .background{
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top:0;
+      z-index: 0;
+      background-image: url(../assets/images/bg.png);
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      h1{
+        text-align: center;
+        color: #fff;
+        font-size: 20px;
+        line-height: 1;
+        font-weight: normal;
+        padding: 20px;
+      }
+      .user-info{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+        header{
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          figure{
+            display: inline-block;
+            width: 70px;
+            height: 70px;
+            -webkit-border-radius: 100px;
+            -moz-border-radius: 100px;
+            border-radius: 100px;
+            margin-right: 10px;
+            overflow: hidden;
+            img{
+              width: 100%;
+              height: 100%;
+            }
+          }
+        }
+        .room-count{
+          color: #fff;
+        }
+      }
+      /*开始按钮*/
+      .start-game {
+        width: 100px;
+        height: 100px;
+        display: block;
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -30%);
+        color: #fff;
+        img{
+          width: 100%;
+          height: 100%;
+        }
+      }
+      /* 回退*/
+      .btn-group{
+        width: 100px;
+        height: 100px;
+        position: fixed;
+        right: 0;
+        bottom: 210px;
+        div{
+          display: flex;
+          justify-content: flex-end;
+          padding: 0 15px ;
+          margin-top: 20px;
+          span{
+            font-size: 12px;
+            color: #838f7b;
+          }
+          span:before{
+            content: "";
+            width: 40px;
+            height: 40px;
+            display: block;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            margin: 0 auto 10px auto;
+          }
+          .reset:before{
+            background-image: url(../assets/images/reset.png);
+
+          }
+          .eraser:before{
+            background-image: url(../assets/images/xpc.png);
+
+          }
+        }
+
+      }
+      /* 画笔选择*/
+      .pencil-select{
+        height: 155px;
+        width: 100%;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        .pencil-title{
+          font-size: 15px;
+          color: #65624f;
+          margin-bottom: 15px;
+          padding-left: 30px;
+        }
+        .pencil-title:after{
+          content: "";
+          display: inline-block;
+          vertical-align: bottom;
+          margin-left: 10px;
+          width: 25px;
+          height: 18px;
+          background-size: cover;
+          background-repeat: no-repeat;
+          background-position: center center;
+          background-image: url(../assets/images/icon.png);
+        }
+        div{
+          background-color: rgba(255,255,255,.5);
+          width: 80%;
+          height: 117px;
+          border-radius: 10px;
+          margin: 0 auto;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          padding: 0 10px;
+          figure{
+            width: 34px;
+            display: inline-block;
+            margin: 0 13px;
+            img{
+              width: 100%;
+              height: 100px;
+            }
+            &:before{
+
+            }
+          }
+        }
+      }
+    }
+  }
   .mask {
     width: 100%;
     height: 100%;
@@ -313,28 +534,17 @@
     bottom: 0;
     left: 0;
     margin: auto;
-    background-color: rgba(0, 0, 0, .3);
+    background-color: rgba(0, 0, 0, .0);
     z-index: 3;
   }
 
-  .start-game {
-    width: 100px;
-    height: 40px;
-    display: block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #f60;
-    border-radius: 40px;
-    border: 0;
-    outline: 0;
-    color: #fff;
-  }
 
   .canvas {
     margin: 0;
     padding: 0;
+    position: fixed;
+    left: 0;
+    top: 0;
   }
 
 

@@ -10,6 +10,7 @@ import GameRoom from '@/views/gameRoom'
 
 const router = new VueRouter({
     routes:[
+        { path: '/', component: Regist},
         { path: '/home', component: Home},
         { path: '/list', component: Home},
         { path: '/regist', component: Regist},
